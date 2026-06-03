@@ -12,4 +12,9 @@ public final class Commands {
     public static @NonNull CommandBuilder create(String label) {
         return CommandBuilder.create(label);
     }
+
+    @Contract("_ -> new")
+    public static @NonNull CommandBuilder literal(String label) {
+        return CommandBuilder.literal(label);
+    }
 }

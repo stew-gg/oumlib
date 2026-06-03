@@ -20,16 +20,10 @@ public final class PermissionBridge {
     private PermissionBridge() {
     }
 
-    /**
-     * Checks if the LuckPerms API is available.
-     */
     public static boolean isAvailable() {
         return luckPerms != null;
     }
 
-    /**
-     * Retrieves the primary group name of a player.
-     */
     public static @Nullable String getPrimaryGroup(@NonNull UUID uuid) {
         if (luckPerms == null) return null;
         try {
@@ -42,9 +36,6 @@ public final class PermissionBridge {
         return null;
     }
 
-    /**
-     * Retrieves the custom prefix of a player.
-     */
     public static @Nullable String getPrefix(@NonNull UUID uuid) {
         if (luckPerms == null) return null;
         try {
@@ -59,9 +50,6 @@ public final class PermissionBridge {
         return null;
     }
 
-    /**
-     * Retrieves the custom suffix of a player.
-     */
     public static @Nullable String getSuffix(@NonNull UUID uuid) {
         if (luckPerms == null) return null;
         try {
@@ -76,9 +64,6 @@ public final class PermissionBridge {
         return null;
     }
 
-    /**
-     * Retrieves a custom meta value of a player by key.
-     */
     public static @Nullable String getMetaValue(@NonNull UUID uuid, @NonNull String key) {
         if (luckPerms == null) return null;
         try {

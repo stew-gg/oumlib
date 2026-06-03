@@ -3,6 +3,7 @@ package dev.oum.oumlib.command;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
+import dev.oum.oumlib.util.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ public final class SubcommandBuilder {
     private final List<Argument<?>> arguments = new ArrayList<>();
     private String label;
     private String permission;
+    private Permission permissionObject;
     private Consumer<CommandContext> executor;
 
     public SubcommandBuilder label(String label) {
@@ -22,6 +24,12 @@ public final class SubcommandBuilder {
 
     public SubcommandBuilder permission(String permission) {
         this.permission = permission;
+        return this;
+    }
+
+    public SubcommandBuilder permission(Permission permission) {
+        this.permissionObject = permission;
+        this.permission = permission.name();
         return this;
     }
 
@@ -41,6 +49,10 @@ public final class SubcommandBuilder {
 
     public String permission() {
         return permission;
+    }
+
+    public Permission permissionObject() {
+        return permissionObject;
     }
 
     @Contract(pure = true)

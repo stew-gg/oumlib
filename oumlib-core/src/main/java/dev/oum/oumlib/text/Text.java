@@ -1,8 +1,10 @@
 package dev.oum.oumlib.text;
 
 import dev.oum.oumlib.OumLib;
+import dev.oum.oumlib.scheduler.Scheduler;
 import dev.oum.oumlib.text.placeholder.PlaceholderResolver;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -156,5 +158,20 @@ public final class Text {
         public static void warningBroadcast(String message, Object... pairs) {
             broadcast(OumLib.presets().prefix(dev.oum.oumlib.text.Preset.WARNING) + message, pairs);
         }
+    }
+
+    public static @NonNull BossBar bossBar(@NonNull Audience audience, @NonNull String titleMiniMessage,
+                                           float progress, BossBar.@NonNull Color color, BossBar.@NonNull Overlay overlay) {
+        Component title = parse(titleMiniMessage);
+        BossBar bar = BossBar.bossBar(title, progress, color, overlay);
+        audience.showBossBar(bar);
+        return bar;
+    }
+
+    public static void bossBarTemporary(@NonNull Audience audience, @NonNull String titleMiniMessage,
+                                        float progress, BossBar.@NonNull Color color, BossBar.@NonNull Overlay overlay,
+                                        @NonNull Duration duration) {
+        BossBar bar = bossBar(audience, titleMiniMessage, progress, color, overlay);
+        Scheduler.runDelayed(duration, () -> audience.hideBossBar(bar));
     }
 }

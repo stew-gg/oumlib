@@ -15,9 +15,6 @@ public final class YamlParser {
     private YamlParser() {
     }
 
-    /**
-     * Parses a YAML file into a Map.
-     */
     public static @NonNull Map<String, Object> parse(@NonNull File file) {
         if (!file.exists()) return new LinkedHashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -27,9 +24,6 @@ public final class YamlParser {
         }
     }
 
-    /**
-     * Parses an input stream of a YAML file into a Map.
-     */
     public static @NonNull Map<String, Object> parse(@NonNull InputStream stream) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return parseReader(reader);

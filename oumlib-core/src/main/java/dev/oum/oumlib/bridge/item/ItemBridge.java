@@ -43,16 +43,10 @@ public final class ItemBridge {
     private ItemBridge() {
     }
 
-    /**
-     * Registers a custom ItemProvider to the bridge.
-     */
     public static void registerProvider(@NonNull ItemProvider provider) {
         providers.put(provider.name().toLowerCase(), provider);
     }
 
-    /**
-     * Resolves an item stack from a formatted identifier string (e.g. "itemsadder:custom_item", "minecraft:diamond", "diamond").
-     */
     public static @NonNull Optional<ItemStack> getItem(@NonNull String identifier) {
         if (identifier.isEmpty()) {
             return Optional.empty();

@@ -1,12 +1,7 @@
 package dev.oum.oumlib.util;
 
-import com.velocitypowered.api.permission.PermissionSubject;
 import dev.oum.oumlib.OumLib;
 import net.kyori.adventure.audience.Audience;
-import org.bukkit.Bukkit;
-import org.bukkit.permissions.Permissible;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -39,16 +34,21 @@ public final class Permission {
         return defaultValue;
     }
 
-    /**
-     * Checks if the given audience has this permission.
-     */
     public boolean has(@NonNull Audience audience) {
-        if (audience instanceof Permissible permissible) {
-            return permissible.hasPermission(name);
+        try {
+            Class<?> permissibleClass = Class.forName("org.bukkit.permissions.Permissible");
+            if (permissibleClass.isInstance(audience)) {
+                return (boolean) permissibleClass.getMethod("hasPermission", String.class).invoke(audience, name);
+            }
+        } catch (Exception ignored) {
         }
 
-        if (audience instanceof PermissionSubject subject) {
-            return subject.hasPermission(name);
+        try {
+            Class<?> subjectClass = Class.forName("com.velocitypowered.api.permission.PermissionSubject");
+            if (subjectClass.isInstance(audience)) {
+                return (boolean) subjectClass.getMethod("hasPermission", String.class).invoke(audience, name);
+            }
+        } catch (Exception ignored) {
         }
 
         return false;
@@ -57,31 +57,13 @@ public final class Permission {
     private void registerOnPaper() {
         try {
             Class.forName("org.bukkit.permissions.Permission");
-            org.bukkit.permissions.Permission bukkitPerm = new org.bukkit.permissions.Permission(
-                    name,
-                    description,
-                    toBukkitDefault(defaultValue)
-            );
-
-            PluginManager pm = Bukkit.getPluginManager();
-            if (pm.getPermission(name) == null) {
-                pm.addPermission(bukkitPerm);
-            }
+            Class.forName("dev.oum.oumlib.util.PaperPermissionHelper")
+                    .getMethod("register", String.class, String.class, Default.class)
+                    .invoke(null, name, description, defaultValue);
         } catch (ClassNotFoundException ignored) {
-
         } catch (Exception e) {
             OumLib.logError("Failed to register Bukkit permission: " + name, e);
         }
-    }
-
-    @Contract(pure = true)
-    private PermissionDefault toBukkitDefault(@NonNull Default def) {
-        return switch (def) {
-            case TRUE -> PermissionDefault.TRUE;
-            case FALSE -> PermissionDefault.FALSE;
-            case OP -> PermissionDefault.OP;
-            case NOT_OP -> PermissionDefault.NOT_OP;
-        };
     }
 
     public enum Default {

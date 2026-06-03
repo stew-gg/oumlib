@@ -125,13 +125,16 @@ Entity entity = Players.getTargetEntity(player, 50);
 
 Kyori's native BossBar API is powerful but requires manual scheduler tracking to clean up. OumLib makes creating self-expiring bossbars easy on both Paper and Velocity:
 
+> [!NOTE]
+> The old utility class `dev.oum.oumlib.util.BossBars` is deprecated since `v1.0.1` and marked for removal in `v1.0.3`. Please use `Text.bossBar` or `Text.bossBarTemporary` instead.
+
 ```java
-import dev.oum.oumlib.util.BossBars;
+import dev.oum.oumlib.text.Text;
 import net.kyori.adventure.bossbar.BossBar;
 import java.time.Duration;
 
 // Show a temporary BossBar that automatically vanishes after 10 seconds
-BossBars.showTemporary(
+Text.bossBarTemporary(
     player, 
     "<red>Danger Zone</red>", 
     1.0f, // progress (0.0 to 1.0)
@@ -143,18 +146,41 @@ BossBars.showTemporary(
 
 ---
 
-## 6. Server Transfer (Velocity-only)
+## 6. Proxy & Routing Utilities (Velocity-only)
 
-Send players between proxy servers using the `Proxy` utility:
+OumLib includes built-in proxy utilities inside the `Proxy` class for handling server transfers, server fallback routing, player counts, and plugin messaging on Velocity.
 
+### Server Connection / Player Transfer
+Transfer players to registered backend servers:
 ```java
 import dev.oum.oumlib.util.Proxy;
 import com.velocitypowered.api.proxy.Player;
 
-Player player = ...;
+Proxy.connect(player, "lobby"); // returns true if connection initiated
+```
 
-// Transfer the player to a server named "lobby"
-boolean success = Proxy.connect(player, "lobby");
+### Auto-Fallback Routing
+When players are kicked or disconnected from a backend server (e.g., during a server crash or restart), automatically redirect them to fallback/lobby servers instead of kicking them from the proxy entirely:
+```java
+import dev.oum.oumlib.util.Proxy;
+import java.util.List;
+
+// Run this during Proxy initialization
+Proxy.registerFallbackRouter(this, List.of("lobby-1", "lobby-2", "hub"));
+```
+
+### Server Player Counts
+Retrieve player counts for a specific server or across a cluster of servers:
+```java
+int lobbyCount = Proxy.getPlayerCount("lobby-1");
+int totalHubPlayers = Proxy.getPlayerCount(List.of("lobby-1", "lobby-2", "hub"));
+```
+
+### Cross-Server Plugin Messaging
+Send plugin message payloads to the player's active backend server connection without writing verbose registration boilerplate:
+```java
+byte[] messagePayload = ...;
+Proxy.sendPluginMessage(player, "myplugin:sync", messagePayload);
 ```
 
 ---

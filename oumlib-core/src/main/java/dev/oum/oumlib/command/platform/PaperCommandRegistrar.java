@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import dev.oum.oumlib.OumLib;
 import dev.oum.oumlib.command.*;
+import dev.oum.oumlib.util.Permission;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -27,14 +28,20 @@ public final class PaperCommandRegistrar implements CommandRegistrar {
     private @NonNull LiteralArgumentBuilder<CommandSourceStack> buildNode(@NonNull CommandBuilder builder) {
         var root = Commands.literal(builder.label());
 
-        if (builder.permission() != null) {
+        if (builder.permissionObject() != null) {
+            Permission permObj = builder.permissionObject();
+            root.requires(source -> permObj.has(source.getSender()));
+        } else if (builder.permission() != null) {
             String perm = builder.permission();
             root.requires(source -> source.getSender().hasPermission(perm));
         }
 
         for (SubcommandBuilder sub : builder.subcommands()) {
             var subLiteral = Commands.literal(sub.label());
-            if (sub.permission() != null) {
+            if (sub.permissionObject() != null) {
+                Permission subPermObj = sub.permissionObject();
+                subLiteral.requires(source -> subPermObj.has(source.getSender()));
+            } else if (sub.permission() != null) {
                 String subPerm = sub.permission();
                 subLiteral.requires(source -> source.getSender().hasPermission(subPerm));
             }

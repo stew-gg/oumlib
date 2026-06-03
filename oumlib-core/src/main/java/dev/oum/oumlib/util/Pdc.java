@@ -19,9 +19,6 @@ public final class Pdc {
     private Pdc() {
     }
 
-    /**
-     * Retrieves a string value from the item's PersistentDataContainer.
-     */
     public static @Nullable String get(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -30,9 +27,6 @@ public final class Pdc {
         return meta.getPersistentDataContainer().get(nsk, PersistentDataType.STRING);
     }
 
-    /**
-     * Retrieves an integer value from the item's PersistentDataContainer.
-     */
     public static @Nullable Integer getInt(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -41,9 +35,6 @@ public final class Pdc {
         return meta.getPersistentDataContainer().get(nsk, PersistentDataType.INTEGER);
     }
 
-    /**
-     * Retrieves a double value from the item's PersistentDataContainer.
-     */
     public static @Nullable Double getDouble(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -52,9 +43,6 @@ public final class Pdc {
         return meta.getPersistentDataContainer().get(nsk, PersistentDataType.DOUBLE);
     }
 
-    /**
-     * Retrieves a boolean value from the item's PersistentDataContainer.
-     */
     public static @Nullable Boolean getBoolean(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -64,9 +52,6 @@ public final class Pdc {
         return b != null ? b != 0 : null;
     }
 
-    /**
-     * Retrieves a long value from the item's PersistentDataContainer.
-     */
     public static @Nullable Long getLong(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();
@@ -75,9 +60,6 @@ public final class Pdc {
         return meta.getPersistentDataContainer().get(nsk, PersistentDataType.LONG);
     }
 
-    /**
-     * Retrieves a string list value from the item's PersistentDataContainer.
-     */
     public static @Nullable List<String> getList(@NonNull ItemStack item, @NonNull String key) {
         if (!item.hasItemMeta()) return null;
         ItemMeta meta = item.getItemMeta();

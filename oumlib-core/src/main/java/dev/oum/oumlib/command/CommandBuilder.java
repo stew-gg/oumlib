@@ -2,6 +2,7 @@ package dev.oum.oumlib.command;
 
 import dev.oum.oumlib.OumLib;
 import dev.oum.oumlib.util.Cooldown;
+import dev.oum.oumlib.util.Permission;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
@@ -18,6 +19,7 @@ public final class CommandBuilder {
     private final List<String> aliases = new ArrayList<>();
     private String description = "";
     private String permission;
+    private Permission permissionObject;
     private String cooldownMessage = "<red>Wait <remaining>s before using this again.";
     private Consumer<CommandContext> executor;
     private Cooldown cooldown;
@@ -27,7 +29,12 @@ public final class CommandBuilder {
     }
 
     @Contract("_ -> new")
-    static @NonNull CommandBuilder create(String label) {
+    public static @NonNull CommandBuilder create(String label) {
+        return new CommandBuilder(label);
+    }
+
+    @Contract("_ -> new")
+    public static @NonNull CommandBuilder literal(String label) {
         return new CommandBuilder(label);
     }
 
@@ -38,6 +45,12 @@ public final class CommandBuilder {
 
     public CommandBuilder permission(String permission) {
         this.permission = permission;
+        return this;
+    }
+
+    public CommandBuilder permission(Permission permission) {
+        this.permissionObject = permission;
+        this.permission = permission.name();
         return this;
     }
 
@@ -100,6 +113,10 @@ public final class CommandBuilder {
 
     public String permission() {
         return permission;
+    }
+
+    public Permission permissionObject() {
+        return permissionObject;
     }
 
     public String cooldownMessage() {

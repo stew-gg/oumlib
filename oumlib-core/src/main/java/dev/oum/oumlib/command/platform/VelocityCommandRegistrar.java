@@ -9,6 +9,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import dev.oum.oumlib.OumLib;
 import dev.oum.oumlib.command.*;
+import dev.oum.oumlib.util.Permission;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jspecify.annotations.NonNull;
 
@@ -31,14 +32,20 @@ public final class VelocityCommandRegistrar implements CommandRegistrar {
     private @NonNull LiteralArgumentBuilder<CommandSource> buildNode(@NonNull CommandBuilder builder) {
         var root = LiteralArgumentBuilder.<CommandSource>literal(builder.label());
 
-        if (builder.permission() != null) {
+        if (builder.permissionObject() != null) {
+            Permission permObj = builder.permissionObject();
+            root.requires(permObj::has);
+        } else if (builder.permission() != null) {
             String perm = builder.permission();
             root.requires(source -> source.hasPermission(perm));
         }
 
         for (SubcommandBuilder sub : builder.subcommands()) {
             var subLiteral = LiteralArgumentBuilder.<CommandSource>literal(sub.label());
-            if (sub.permission() != null) {
+            if (sub.permissionObject() != null) {
+                Permission subPermObj = sub.permissionObject();
+                subLiteral.requires(subPermObj::has);
+            } else if (sub.permission() != null) {
                 String subPerm = sub.permission();
                 subLiteral.requires(source -> source.hasPermission(subPerm));
             }

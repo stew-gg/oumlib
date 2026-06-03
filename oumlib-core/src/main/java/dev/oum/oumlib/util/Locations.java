@@ -11,10 +11,6 @@ public final class Locations {
     private Locations() {
     }
 
-    /**
-     * Serializes a Location to a standard comma-separated String.
-     * Format: world,x,y,z,yaw,pitch
-     */
     public static @NonNull String serialize(@NonNull Location loc) {
         return (loc.getWorld() != null ? loc.getWorld().getName() : "world") + "," +
                 loc.getX() + "," +
@@ -24,10 +20,6 @@ public final class Locations {
                 loc.getPitch();
     }
 
-    /**
-     * Serializes a Location to a block-only format (no yaw/pitch).
-     * Format: world,x,y,z
-     */
     public static @NonNull String serializeBlock(@NonNull Location loc) {
         return (loc.getWorld() != null ? loc.getWorld().getName() : "world") + "," +
                 loc.getBlockX() + "," +
@@ -35,9 +27,6 @@ public final class Locations {
                 loc.getBlockZ();
     }
 
-    /**
-     * Deserializes a Location from a comma-separated String.
-     */
     public static @Nullable Location deserialize(@NonNull String str) {
         String[] parts = str.split(",");
         if (parts.length < 4) return null;
@@ -57,10 +46,6 @@ public final class Locations {
         }
     }
 
-    /**
-     * Serializes a Location along with its chunk coordinates for Folia region compatibility.
-     * Format: world,x,y,z,yaw,pitch,chunkX,chunkZ
-     */
     public static @NonNull String serializeRegion(@NonNull Location loc) {
         return serialize(loc) + "," + (loc.getBlockX() >> 4) + "," + (loc.getBlockZ() >> 4);
     }

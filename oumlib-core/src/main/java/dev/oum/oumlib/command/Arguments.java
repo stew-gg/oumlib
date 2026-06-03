@@ -9,10 +9,9 @@ import org.bukkit.Material;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
+import dev.oum.oumlib.util.Format;
 import java.time.Duration;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class Arguments {
 
@@ -96,33 +95,11 @@ public final class Arguments {
     @Contract("_ -> new")
     public static @NonNull Argument<Duration> duration(String name) {
         return new Argument<>(name, StringArgumentType.word(), (raw, ctx)
-                -> parseDuration(raw.toString()));
+                -> Format.parseDuration(raw.toString()));
     }
 
-    private static Duration parseDuration(@NonNull String input) {
-        String cleaned = input.toLowerCase(Locale.ROOT).replaceAll("\\s+", "");
-        long totalSeconds = 0;
-        Pattern pattern = Pattern.compile("(\\d+)([dhms])");
-        Matcher matcher = pattern.matcher(cleaned);
-        boolean matched = false;
-        while (matcher.find()) {
-            matched = true;
-            long val = Long.parseLong(matcher.group(1));
-            String unit = matcher.group(2);
-            switch (unit) {
-                case "d" -> totalSeconds += val * 24 * 60 * 60;
-                case "h" -> totalSeconds += val * 60 * 60;
-                case "m" -> totalSeconds += val * 60;
-                case "s" -> totalSeconds += val;
-            }
-        }
-        if (!matched) {
-            try {
-                return Duration.ofSeconds(Long.parseLong(cleaned));
-            } catch (NumberFormatException e) {
-                return Duration.ZERO;
-            }
-        }
-        return Duration.ofSeconds(totalSeconds);
+    @Deprecated(since = "1.0.1", forRemoval = true)
+    public static Duration parseDuration(@NonNull String input) {
+        return Format.parseDuration(input);
     }
 }

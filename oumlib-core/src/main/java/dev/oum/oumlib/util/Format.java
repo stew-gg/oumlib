@@ -4,6 +4,9 @@ import org.jspecify.annotations.NonNull;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class Format {
 
@@ -13,9 +16,6 @@ public final class Format {
     private Format() {
     }
 
-    /**
-     * Formats a duration into a clean string (e.g., 125s -> "2m 5s", 45s -> "45s").
-     */
     public static @NonNull String duration(@NonNull Duration duration) {
         long seconds = duration.getSeconds();
         if (seconds <= 0) return "0s";
@@ -32,9 +32,6 @@ public final class Format {
         return sb.toString().trim();
     }
 
-    /**
-     * Formats a duration into standard digital time (e.g., 125s -> "02:05", 3665s -> "01:01:05").
-     */
     public static @NonNull String digitalTime(@NonNull Duration duration) {
         long seconds = duration.getSeconds();
         if (seconds <= 0) return "00:00";
@@ -50,19 +47,40 @@ public final class Format {
         }
     }
 
-    /**
-     * Formats a number with comma separators (e.g., 1250000 -> "1,250,000").
-     */
     public static String number(double number) {
         return NUMBER_FORMAT.format(number);
     }
 
-    /**
-     * Compacts a number into suffixes (e.g., 1500 -> "1.5k", 2500000 -> "2.5M").
-     */
     public static String compactNumber(double number) {
         if (number < 1000) return String.valueOf((int) number);
         int exp = (int) (Math.log(number) / Math.log(1000));
         return String.format("%.1f%s", number / Math.pow(1000, exp), SUFFIXES[exp]);
+    }
+
+    public static @NonNull Duration parseDuration(@NonNull String input) {
+        String cleaned = input.toLowerCase(Locale.ROOT).replaceAll("\\s+", "");
+        long totalSeconds = 0;
+        Pattern pattern = Pattern.compile("(\\d+)([dhms])");
+        Matcher matcher = pattern.matcher(cleaned);
+        boolean matched = false;
+        while (matcher.find()) {
+            matched = true;
+            long val = Long.parseLong(matcher.group(1));
+            String unit = matcher.group(2);
+            switch (unit) {
+                case "d" -> totalSeconds += val * 24 * 60 * 60;
+                case "h" -> totalSeconds += val * 60 * 60;
+                case "m" -> totalSeconds += val * 60;
+                case "s" -> totalSeconds += val;
+            }
+        }
+        if (!matched) {
+            try {
+                return Duration.ofSeconds(Long.parseLong(cleaned));
+            } catch (NumberFormatException e) {
+                return Duration.ZERO;
+            }
+        }
+        return Duration.ofSeconds(totalSeconds);
     }
 }

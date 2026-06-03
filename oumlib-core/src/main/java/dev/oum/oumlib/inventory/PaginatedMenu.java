@@ -27,6 +27,7 @@ public final class PaginatedMenu implements Menu {
     private final Function<Integer, ItemStack> prevButton;
     private final Function<Integer, ItemStack> nextButton;
     private final List<ItemStack> items;
+    private final PaginatedClickHandler clickHandler;
     private final Map<UUID, Integer> pages = new HashMap<>();
     private final Map<UUID, Inventory> open = new HashMap<>();
 
@@ -39,6 +40,7 @@ public final class PaginatedMenu implements Menu {
         this.prevButton = builder.prevButton;
         this.nextButton = builder.nextButton;
         this.items = List.copyOf(builder.items);
+        this.clickHandler = builder.clickHandler;
         registerClickListener();
     }
 
@@ -109,9 +111,27 @@ public final class PaginatedMenu implements Menu {
             if (slot == prevSlot && page > 1) {
                 pages.put(player.getUniqueId(), page - 1);
                 reopen(player);
+                return;
             } else if (slot == nextSlot && page < totalPages()) {
                 pages.put(player.getUniqueId(), page + 1);
                 reopen(player);
+                return;
+            }
+
+            if (clickHandler != null) {
+                for (int i = 0; i < contentSlots.length; i++) {
+                    if (contentSlots[i] == slot) {
+                        int idx = (page - 1) * contentSlots.length + i;
+                        if (idx < items.size()) {
+                            clickHandler.onClick(
+                                    new ClickContext(player, ClickAction.from(event.getClick()), slot),
+                                    items.get(idx),
+                                    idx
+                            );
+                        }
+                        break;
+                    }
+                }
             }
         });
 
@@ -137,6 +157,12 @@ public final class PaginatedMenu implements Menu {
                 .name("<gray>Previous").build();
         private Function<Integer, ItemStack> nextButton = _ -> ItemBuilder.of(Material.ARROW)
                 .name("<gray>Next").build();
+        private PaginatedClickHandler clickHandler;
+
+        public Builder onClick(PaginatedClickHandler handler) {
+            this.clickHandler = handler;
+            return this;
+        }
 
         public Builder title(String title) {
             this.title = title;
@@ -174,5 +200,10 @@ public final class PaginatedMenu implements Menu {
         public @NonNull PaginatedMenu build() {
             return new PaginatedMenu(this);
         }
+    }
+
+    @FunctionalInterface
+    public interface PaginatedClickHandler {
+        void onClick(ClickContext ctx, ItemStack item, int index);
     }
 }
