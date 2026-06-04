@@ -26,7 +26,7 @@ public final class Database {
     }
 
     public static @NonNull Database sqlite(@NonNull File file) {
-        return sqlite(file, _ -> {
+        return sqlite(file, cfg -> {
         });
     }
 
@@ -53,7 +53,7 @@ public final class Database {
             @NonNull String username,
             @NonNull String password
     ) {
-        return mysql(host, port, database, username, password, _ -> {
+        return mysql(host, port, database, username, password, cfg -> {
         });
     }
 

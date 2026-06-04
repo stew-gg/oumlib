@@ -133,6 +133,9 @@ public final class ConfigManager<T extends Record & ConfigSection> {
 
     public ConfigManager<T> enableAutoReload() {
         File dir = OumLib.getDataFolder();
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
         try {
             WatchService ws = FileSystems.getDefault().newWatchService();
             dir.toPath().register(ws, StandardWatchEventKinds.ENTRY_MODIFY);
