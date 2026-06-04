@@ -48,7 +48,7 @@ public final class Layout {
             for (int col = 0; col < Math.min(line.length(), 9); col++) {
                 char c = line.charAt(col);
                 int slot = row * 9 + col;
-                slotMap.computeIfAbsent(c, _ -> new ArrayList<>()).add(slot);
+                slotMap.computeIfAbsent(c, k -> new ArrayList<>()).add(slot);
             }
         }
     }

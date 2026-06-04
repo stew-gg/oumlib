@@ -39,6 +39,8 @@ public final class Permission {
         try {
             Class<?> permissibleClass = Class.forName("org.bukkit.permissions.Permissible");
             if (permissibleClass.isInstance(audience)) {
+                boolean isOp = (boolean) permissibleClass.getMethod("isOp").invoke(audience);
+                if (isOp) return true;
                 return (boolean) permissibleClass.getMethod("hasPermission", String.class).invoke(audience, name);
             }
         } catch (Exception ignored) {

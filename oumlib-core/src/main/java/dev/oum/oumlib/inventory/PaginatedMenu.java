@@ -158,9 +158,9 @@ public final class PaginatedMenu implements Menu {
         private int[] contentSlots = {10, 11, 12, 13, 14, 15, 16};
         private int prevSlot = 45;
         private int nextSlot = 53;
-        private Function<Integer, ItemStack> prevButton = _ -> ItemBuilder.of(Material.ARROW)
+        private Function<Integer, ItemStack> prevButton = page -> ItemBuilder.of(Material.ARROW)
                 .name("<gray>Previous").build();
-        private Function<Integer, ItemStack> nextButton = _ -> ItemBuilder.of(Material.ARROW)
+        private Function<Integer, ItemStack> nextButton = page -> ItemBuilder.of(Material.ARROW)
                 .name("<gray>Next").build();
         private PaginatedClickHandler clickHandler;
 
