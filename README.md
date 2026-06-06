@@ -171,3 +171,4 @@ Detailed guides for each package:
 - **[Text & Placeholders](docs/text.md)**: MiniMessage text presets and custom placeholders.
 - **[Plugin Bridges](docs/bridges.md)**: Economy, Custom Items, Nexo, and LuckPerms Permission Bridges.
 - **[General Utilities](docs/utilities.md)**: PDC wrappers, duration formatting, and location serialization.
+- **[Web & Discord Webhooks](docs/web.md)**: Asynchronous Discord Webhook client and embed builder.
