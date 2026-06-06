@@ -137,6 +137,20 @@ public final class Text {
         Scheduler.runDelayed(duration, () -> audience.hideBossBar(bar));
     }
 
+    public static void ascii(boolean colorized, String... lines) {
+        for (String line : lines) {
+            if (colorized) {
+                OumLib.console().sendMessage(MM.deserialize(line));
+            } else {
+                OumLib.console().sendMessage(Component.text(line));
+            }
+        }
+    }
+
+    public static void ascii(String... lines) {
+        ascii(false, lines);
+    }
+
     public static final class Preset {
 
         private Preset() {
