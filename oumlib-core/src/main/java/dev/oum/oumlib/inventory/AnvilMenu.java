@@ -1,13 +1,18 @@
 package dev.oum.oumlib.inventory;
 
 import dev.oum.oumlib.event.Events;
+import dev.oum.oumlib.scheduler.Scheduler;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.view.AnvilView;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
@@ -18,6 +23,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings({"UnstableApiUsage", "unused"})
 public final class AnvilMenu implements Menu {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
@@ -27,6 +33,8 @@ public final class AnvilMenu implements Menu {
     private final BiConsumer<Player, String> onConfirm;
     private final Consumer<Player> onClose;
     private final Map<UUID, Inventory> open = new HashMap<>();
+    private final Map<UUID, Integer> originalLevels = new HashMap<>();
+    private final Map<UUID, Float> originalExp = new HashMap<>();
 
     private AnvilMenu(@NonNull Builder builder) {
         this.title = builder.title;
@@ -45,6 +53,14 @@ public final class AnvilMenu implements Menu {
     public void open(@NonNull Player player) {
         Inventory inv = player.getServer().createInventory(player, InventoryType.ANVIL, MM.deserialize(title));
         inv.setItem(0, ItemBuilder.of(Material.PAPER).name(placeholder).build());
+
+        originalLevels.put(player.getUniqueId(), player.getLevel());
+        originalExp.put(player.getUniqueId(), player.getExp());
+        if (player.getLevel() < 1) {
+            player.setLevel(1);
+            player.setExp(0.0f);
+        }
+
         open.put(player.getUniqueId(), inv);
         player.openInventory(inv);
     }
@@ -52,14 +68,25 @@ public final class AnvilMenu implements Menu {
     @Override
     public void close(@NonNull Player player) {
         open.remove(player.getUniqueId());
+        restoreExperience(player);
         player.closeInventory();
+    }
+
+    private void restoreExperience(@NonNull Player player) {
+        Integer lvl = originalLevels.remove(player.getUniqueId());
+        Float exp = originalExp.remove(player.getUniqueId());
+        if (lvl != null && exp != null) {
+            player.setLevel(lvl);
+            player.setExp(exp);
+        }
     }
 
     private void registerListeners() {
         Events.listen(InventoryClickEvent.class, event -> {
             if (!(event.getWhoClicked() instanceof Player player)) return;
             Inventory inv = open.get(player.getUniqueId());
-            if (inv == null || !event.getInventory().equals(inv)) return;
+            if (inv == null) return;
+            if (event.getInventory().getType() != InventoryType.ANVIL) return;
             if (event.getSlot() != 2) {
                 event.setCancelled(true);
                 return;
@@ -67,15 +94,46 @@ public final class AnvilMenu implements Menu {
             if (!(event.getView() instanceof AnvilView anvilView)) return;
             var input = anvilView.getRenameText();
             open.remove(player.getUniqueId());
+            restoreExperience(player);
             player.closeInventory();
             if (onConfirm != null) onConfirm.accept(player, input != null ? input : "");
         });
 
         Events.listen(InventoryCloseEvent.class, event -> {
             if (!(event.getPlayer() instanceof Player player)) return;
-            if (open.remove(player.getUniqueId()) != null && onClose != null) {
-                onClose.accept(player);
+            if (open.remove(player.getUniqueId()) != null) {
+                restoreExperience(player);
+                if (onClose != null) {
+                    onClose.accept(player);
+                }
             }
+        });
+
+        Events.listen(PlayerQuitEvent.class, event -> {
+            Player player = event.getPlayer();
+            if (open.remove(player.getUniqueId()) != null) {
+                restoreExperience(player);
+            }
+        });
+
+        Events.listen(PrepareAnvilEvent.class, event -> {
+            if (!(event.getView().getPlayer() instanceof Player player)) return;
+            Inventory openInv = open.get(player.getUniqueId());
+            if (openInv == null) return;
+            if (!(event.getView() instanceof AnvilView anvilView)) return;
+            AnvilInventory inv = event.getInventory();
+            ItemStack first = inv.getItem(0);
+            if (first == null) return;
+
+            String renameText = anvilView.getRenameText();
+            if (renameText == null) {
+                renameText = "";
+            }
+
+            ItemStack result = ItemBuilder.of(first.getType()).name(renameText).build();
+            event.setResult(result);
+
+            Scheduler.run(() -> anvilView.setRepairCost(0));
         });
     }
 
