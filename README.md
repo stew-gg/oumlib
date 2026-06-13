@@ -2,11 +2,11 @@
 
 [![](https://jitpack.io/v/sun-mc-dev/oumlib.svg)](https://jitpack.io/#sun-mc-dev/oumlib)
 
-A lightweight, multi-platform library for Paper (Minecraft servers) and Velocity (proxies) built for Java 25. It helps developers write clean, boilerplate-free code.
+A lightweight, multi-platform library for Paper (Minecraft servers) and Velocity (proxies) built for Java 21. It helps developers write clean, boilerplate-free code.
 
 ## Requirements & Compatibility
 
-- **Java**: Java 25 or higher (utilizes Virtual Threads).
+- **Java**: Java 21 or higher (utilizes Virtual Threads).
 - **Paper**: Version 1.21.4 or newer.
 - **Velocity**: Version 3.5.x or newer.
 - **Folia**: Fully compatible. Tasks run on safe async scheduler structures, and it supports Folia's multi-threaded tick environment.
@@ -55,10 +55,14 @@ Add this `maven-shade-plugin` configuration to your plugin's `pom.xml`:
             <configuration>
                 <createDependencyReducedPom>false</createDependencyReducedPom>
                 <relocations>
-                    <!-- Relocate oumlib into your own plugin package -->
+                    <!-- Relocate oumlib & hikari into your own plugin package -->
                     <relocation>
                         <pattern>dev.oum.oumlib</pattern>
                         <shadedPattern>your.plugin.package.libs.oumlib</shadedPattern>
+                    </relocation>
+                    <relocation>
+                        <pattern>com.zaxxer</pattern>
+                        <shadedPattern>your.plugin.package.libs.hikari</shadedPattern>
                     </relocation>
                 </relocations>
                 <filters>
