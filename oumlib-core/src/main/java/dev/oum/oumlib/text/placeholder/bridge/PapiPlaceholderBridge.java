@@ -13,19 +13,21 @@ public final class PapiPlaceholderBridge extends PlaceholderExpansion {
 
     private final Plugin plugin;
     private final PlaceholderRegistry registry;
+    private final String namespace;
 
-    private PapiPlaceholderBridge(Plugin plugin, PlaceholderRegistry registry) {
+    private PapiPlaceholderBridge(Plugin plugin, PlaceholderRegistry registry, String namespace) {
         this.plugin = plugin;
         this.registry = registry;
+        this.namespace = namespace;
     }
 
-    public static void register(Plugin plugin, PlaceholderRegistry registry) {
-        new PapiPlaceholderBridge(plugin, registry).register();
+    public static void register(Plugin plugin, PlaceholderRegistry registry, String namespace) {
+        new PapiPlaceholderBridge(plugin, registry, namespace).register();
     }
 
     @Override
     public @NotNull String getIdentifier() {
-        return plugin.getName().toLowerCase();
+        return namespace;
     }
 
     @Override
@@ -45,10 +47,6 @@ public final class PapiPlaceholderBridge extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
-        for (String ns : registry.getNamespaces().keySet()) {
-            String resolved = registry.resolve(ns, params, player, Map.of());
-            if (resolved != null) return resolved;
-        }
-        return null;
+        return registry.resolve(namespace, params, player, Map.of());
     }
 }

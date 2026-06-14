@@ -1,5 +1,9 @@
 package dev.oum.oumlib.text.placeholder;
 
+import dev.oum.oumlib.OumLib;
+import dev.oum.oumlib.text.placeholder.bridge.MiniPlaceholdersHelper;
+import dev.oum.oumlib.text.placeholder.bridge.PapiHelper;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
@@ -44,19 +48,13 @@ public final class PlaceholderRegistry {
         try {
             Class.forName("org.bukkit.Bukkit");
             Class.forName("me.clip.placeholderapi.PlaceholderAPI");
-            Class<?> helperClass = Class.forName("dev.oum.oumlib.text.placeholder.bridge.PapiHelper");
-            Class<?> oumLibClass = Class.forName("dev.oum.oumlib.OumLib");
-            Object plugin = oumLibClass.getMethod("plugin").invoke(null);
-            Class<?> pluginClass = Class.forName("org.bukkit.plugin.Plugin");
-            helperClass.getMethod("register", pluginClass, PlaceholderRegistry.class)
-                    .invoke(null, plugin, this);
+            PapiHelper.register((Plugin) OumLib.plugin(), this);
         } catch (Throwable ignored) {
         }
 
         try {
             Class.forName("io.github.miniplaceholders.api.Expansion");
-            Class<?> helperClass = Class.forName("dev.oum.oumlib.text.placeholder.bridge.MiniPlaceholdersHelper");
-            helperClass.getMethod("register", PlaceholderRegistry.class).invoke(null, this);
+            MiniPlaceholdersHelper.register(this);
         } catch (Throwable ignored) {
         }
     }
