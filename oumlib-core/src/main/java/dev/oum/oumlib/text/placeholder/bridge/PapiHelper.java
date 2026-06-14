@@ -8,6 +8,8 @@ public final class PapiHelper {
     }
 
     public static void register(Plugin plugin, PlaceholderRegistry registry) {
-        PapiPlaceholderBridge.register(plugin, registry);
+        for (String namespace : registry.getNamespaces().keySet()) {
+            PapiPlaceholderBridge.register(plugin, registry, namespace);
+        }
     }
 }

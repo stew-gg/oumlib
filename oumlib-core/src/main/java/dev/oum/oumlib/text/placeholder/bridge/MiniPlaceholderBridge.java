@@ -39,20 +39,20 @@ public final class MiniPlaceholderBridge {
     }
 
     public static void register(@NonNull PlaceholderRegistry registry) {
-        Expansion.Builder builder = Expansion.builder("oumlib");
         for (Map.Entry<String, Map<String, PlaceholderSupplier>> ns : registry.getNamespaces().entrySet()) {
+            String namespace = ns.getKey();
+            Expansion.Builder builder = Expansion.builder(namespace);
+
             for (String key : ns.getValue().keySet()) {
-                String tagName = ns.getKey() + "_" + key;
-                String nsKey = ns.getKey();
-                builder.audiencePlaceholder(tagName, (audience, queue, ctx) -> {
+                builder.audiencePlaceholder(key, (audience, queue, ctx) -> {
                     if (isPlayer(audience)) {
-                        String resolved = registry.resolve(nsKey, key, audience, Map.of());
+                        String resolved = registry.resolve(namespace, key, audience, Map.of());
                         if (resolved != null) return Tag.inserting(Component.text(resolved));
                     }
                     return Tag.selfClosingInserting(Component.empty());
                 });
             }
+            builder.build().register();
         }
-        builder.build().register();
     }
 }
