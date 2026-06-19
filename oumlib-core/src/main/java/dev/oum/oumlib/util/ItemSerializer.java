@@ -32,7 +32,7 @@ public final class ItemSerializer {
     }
 
     public static @NonNull String serialize(@Nullable ItemStack item) {
-        if (item == null) return "";
+        if (item == null || item.isEmpty()) return "";
         try {
             byte[] bytes = serializeToBytes(item);
             return Base64.getEncoder().encodeToString(bytes);
@@ -56,7 +56,7 @@ public final class ItemSerializer {
              DataOutputStream dos = new DataOutputStream(baos)) {
             dos.writeInt(items.length);
             for (ItemStack item : items) {
-                if (item == null) {
+                if (item == null || item.isEmpty()) {
                     dos.writeInt(-1);
                 } else {
                     byte[] bytes = serializeToBytes(item);
