@@ -1,4 +1,4 @@
-package dev.oum.oumlib.util;
+package dev.oum.oumlib.effect;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -6,7 +6,6 @@ import org.bukkit.Particle;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-@Deprecated(since = "1.0.5", forRemoval = true)
 public final class Particles {
 
     private Particles() {

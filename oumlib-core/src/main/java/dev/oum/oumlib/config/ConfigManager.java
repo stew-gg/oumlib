@@ -342,6 +342,14 @@ public final class ConfigManager<T extends Record & ConfigSection> {
         }
         StringBuilder yaml = new StringBuilder();
 
+        Comment header = type.getAnnotation(Comment.class);
+        if (header != null) {
+            for (String line : header.value()) {
+                yaml.append("# ").append(line).append('\n');
+            }
+            yaml.append('\n');
+        }
+
         writeRecord(yaml, config, 0);
 
         if (!preservedUnknown.isEmpty()) {

@@ -1,4 +1,4 @@
-package dev.oum.oumlib.util;
+package dev.oum.oumlib.effect;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -9,7 +9,6 @@ import org.jspecify.annotations.NonNull;
 import java.util.Locale;
 
 @SuppressWarnings("PatternValidation")
-@Deprecated(since = "1.0.5", forRemoval = true)
 public final class Sounds {
 
     private Sounds() {
