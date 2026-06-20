@@ -25,7 +25,9 @@ import org.jspecify.annotations.NonNull;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -238,7 +240,27 @@ public final class ItemBuilder {
             try {
                 PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), null);
                 PlayerTextures textures = profile.getTextures();
-                URL url = URI.create("https://textures.minecraft.net/texture/" + textureValue).toURL();
+                
+                String targetUrl = textureValue;
+                if (textureValue.startsWith("ey")) {
+                    try {
+                        String decodedStr = new String(Base64.getDecoder().decode(textureValue), StandardCharsets.UTF_8);
+                        int index = decodedStr.indexOf("\"url\":\"");
+                        if (index != -1) {
+                            int start = index + 7;
+                            int end = decodedStr.indexOf("\"", start);
+                            if (end != -1) {
+                                targetUrl = decodedStr.substring(start, end);
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+                
+                if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+                    targetUrl = "https://textures.minecraft.net/texture/" + targetUrl;
+                }
+                
+                URL url = URI.create(targetUrl).toURL();
                 textures.setSkin(url);
                 profile.setTextures(textures);
                 skullMeta.setPlayerProfile(profile);
