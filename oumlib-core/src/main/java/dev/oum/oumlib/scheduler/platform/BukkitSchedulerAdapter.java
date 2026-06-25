@@ -19,7 +19,7 @@ public final class BukkitSchedulerAdapter implements SchedulerAdapter {
     static {
         boolean folia = false;
         try {
-            Class.forName("io.papermc.paper.threadedregions.RegionScheduler");
+            Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
             folia = true;
         } catch (ClassNotFoundException ignored) {
         }
