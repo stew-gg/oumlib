@@ -1,5 +1,6 @@
 package dev.oum.oumlib.entity;
 
+import dev.oum.oumlib.math.FastMath;
 import dev.oum.oumlib.scheduler.Promise;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -174,11 +175,11 @@ public final class Entities {
     public static void heal(@NonNull LivingEntity entity, double amount) {
         AttributeInstance attr = entity.getAttribute(Attribute.MAX_HEALTH);
         double maxHealth = attr != null ? attr.getValue() : entity.getHealth();
-        entity.setHealth(Math.min(entity.getHealth() + amount, maxHealth));
+        entity.setHealth(FastMath.min(entity.getHealth() + amount, maxHealth));
     }
 
     public static void setSpeed(@NonNull Player player, double speed) {
-        player.setWalkSpeed((float) Math.clamp(speed, -1.0, 1.0));
+        player.setWalkSpeed((float) FastMath.clamp(speed, -1.0, 1.0));
     }
 
     public static void resetSpeed(@NonNull Player player) {

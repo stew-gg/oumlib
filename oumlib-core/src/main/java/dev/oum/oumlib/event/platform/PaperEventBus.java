@@ -1,10 +1,12 @@
 package dev.oum.oumlib.event.platform;
 
 import dev.oum.oumlib.event.EventBuilder;
+import dev.oum.oumlib.event.EventPriority;
 import dev.oum.oumlib.event.ListenerHandle;
 import dev.oum.oumlib.scheduler.Scheduler;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
@@ -32,7 +34,7 @@ public final class PaperEventBus implements EventBusAdapter {
     }
 
     @Contract(pure = true)
-    private static org.bukkit.event.EventPriority toBukkitPriority(dev.oum.oumlib.event.@NonNull EventPriority priority) {
+    private static org.bukkit.event.EventPriority toBukkitPriority(@NonNull EventPriority priority) {
         return switch (priority) {
             case LOWEST -> org.bukkit.event.EventPriority.LOWEST;
             case LOW -> org.bukkit.event.EventPriority.LOW;
@@ -53,7 +55,7 @@ public final class PaperEventBus implements EventBusAdapter {
         Listener listener = new Listener() {
         };
 
-        ListenerHandle handle = new ListenerHandle(() -> org.bukkit.event.HandlerList.unregisterAll(listener));
+        ListenerHandle handle = new ListenerHandle(() -> HandlerList.unregisterAll(listener));
 
         plugin.getServer().getPluginManager().registerEvent(
                 eventClass,

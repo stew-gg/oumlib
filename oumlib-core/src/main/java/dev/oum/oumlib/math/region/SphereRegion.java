@@ -1,5 +1,6 @@
 package dev.oum.oumlib.math.region;
 
+import dev.oum.oumlib.math.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -25,7 +26,7 @@ public class SphereRegion implements Region {
         this.centerX = center.getX();
         this.centerY = center.getY();
         this.centerZ = center.getZ();
-        this.radius = Math.max(0.0, radius);
+        this.radius = FastMath.max(0.0, radius);
     }
 
     public SphereRegion(@NonNull String worldName, double centerX, double centerY, double centerZ, double radius) {
@@ -33,7 +34,7 @@ public class SphereRegion implements Region {
         this.centerX = centerX;
         this.centerY = centerY;
         this.centerZ = centerZ;
-        this.radius = Math.max(0.0, radius);
+        this.radius = FastMath.max(0.0, radius);
     }
 
     public static @NonNull SphereRegion of(@NonNull Location center, double radius) {
@@ -122,7 +123,7 @@ public class SphereRegion implements Region {
 
     @Override
     public double getVolume() {
-        return (4.0 / 3.0) * Math.PI * radius * radius * radius;
+        return (4.0 / 3.0) * FastMath.PI * radius * radius * radius;
     }
 
     @Override
@@ -143,13 +144,13 @@ public class SphereRegion implements Region {
     public @NonNull Location getRandomLocation(@NonNull Random random) {
         double u = random.nextDouble();
         double v = random.nextDouble();
-        double theta = u * 2.0 * Math.PI;
+        double theta = u * 2.0 * FastMath.PI;
         double phi = Math.acos(2.0 * v - 1.0);
         double r = Math.cbrt(random.nextDouble()) * radius;
-        double sinPhi = Math.sin(phi);
-        double rx = centerX + r * sinPhi * Math.cos(theta);
-        double ry = centerY + r * Math.cos(phi);
-        double rz = centerZ + r * sinPhi * Math.sin(theta);
+        double sinPhi = FastMath.sin(phi);
+        double rx = centerX + r * sinPhi * FastMath.cos(theta);
+        double ry = centerY + r * FastMath.cos(phi);
+        double rz = centerZ + r * sinPhi * FastMath.sin(theta);
         return new Location(getWorld(), rx, ry, rz);
     }
 
@@ -158,10 +159,10 @@ public class SphereRegion implements Region {
         World w = getWorld();
         if (w == null) return Collections.emptySet();
         Set<Chunk> chunks = new HashSet<>();
-        int minChunkX = (int) Math.floor(centerX - radius) >> 4;
-        int maxChunkX = (int) Math.floor(centerX + radius) >> 4;
-        int minChunkZ = (int) Math.floor(centerZ - radius) >> 4;
-        int maxChunkZ = (int) Math.floor(centerZ + radius) >> 4;
+        int minChunkX = FastMath.floorToInt(centerX - radius) >> 4;
+        int maxChunkX = FastMath.floorToInt(centerX + radius) >> 4;
+        int minChunkZ = FastMath.floorToInt(centerZ - radius) >> 4;
+        int maxChunkZ = FastMath.floorToInt(centerZ + radius) >> 4;
         for (int cx = minChunkX; cx <= maxChunkX; cx++) {
             for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
                 chunks.add(w.getChunkAt(cx, cz));
@@ -173,10 +174,10 @@ public class SphereRegion implements Region {
     @Override
     public @NonNull Set<Long> getIntersectingChunkKeys() {
         Set<Long> keys = new HashSet<>();
-        int minChunkX = (int) Math.floor(centerX - radius) >> 4;
-        int maxChunkX = (int) Math.floor(centerX + radius) >> 4;
-        int minChunkZ = (int) Math.floor(centerZ - radius) >> 4;
-        int maxChunkZ = (int) Math.floor(centerZ + radius) >> 4;
+        int minChunkX = FastMath.floorToInt(centerX - radius) >> 4;
+        int maxChunkX = FastMath.floorToInt(centerX + radius) >> 4;
+        int minChunkZ = FastMath.floorToInt(centerZ - radius) >> 4;
+        int maxChunkZ = FastMath.floorToInt(centerZ + radius) >> 4;
         for (int cx = minChunkX; cx <= maxChunkX; cx++) {
             for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
                 keys.add(Chunk.getChunkKey(cx, cz));
@@ -189,12 +190,12 @@ public class SphereRegion implements Region {
     public @NonNull Iterator<Block> iterator() {
         return new Iterator<>() {
             private final World world = getWorld();
-            private final int minBx = (int) Math.floor(centerX - radius);
-            private final int maxBx = (int) Math.floor(centerX + radius);
-            private final int minBy = (int) Math.floor(centerY - radius);
-            private final int maxBy = (int) Math.floor(centerY + radius);
-            private final int minBz = (int) Math.floor(centerZ - radius);
-            private final int maxBz = (int) Math.floor(centerZ + radius);
+            private final int minBx = FastMath.floorToInt(centerX - radius);
+            private final int maxBx = FastMath.floorToInt(centerX + radius);
+            private final int minBy = FastMath.floorToInt(centerY - radius);
+            private final int maxBy = FastMath.floorToInt(centerY + radius);
+            private final int minBz = FastMath.floorToInt(centerZ - radius);
+            private final int maxBz = FastMath.floorToInt(centerZ + radius);
 
             private int currentX = minBx;
             private int currentY = minBy;

@@ -2,6 +2,7 @@ package dev.oum.oumlib.inventory;
 
 import dev.oum.oumlib.event.Events;
 import dev.oum.oumlib.event.ListenerHandle;
+import dev.oum.oumlib.math.FastMath;
 import dev.oum.oumlib.scheduler.Scheduler;
 import dev.oum.oumlib.scheduler.TaskHandle;
 import net.kyori.adventure.sound.Sound;
@@ -183,7 +184,7 @@ public final class ChestMenu implements Menu {
             if (existing != null && !existing.getType().isAir() && existing.isSimilar(stack)) {
                 int room = existing.getMaxStackSize() - existing.getAmount();
                 if (room > 0) {
-                    int toAdd = Math.min(room, stack.getAmount());
+                    int toAdd = FastMath.min(room, stack.getAmount());
                     existing.setAmount(existing.getAmount() + toAdd);
                     stack.setAmount(stack.getAmount() - toAdd);
                     if (stack.getAmount() <= 0) {
@@ -386,6 +387,15 @@ public final class ChestMenu implements Menu {
         }
 
         @CheckReturnValue
+        public @NonNull Builder bind(char key, @NonNull GuiButton button) {
+            if (layout != null) {
+                layout.bind(key, button);
+                onClick(key, button::handleClick);
+            }
+            return this;
+        }
+
+        @CheckReturnValue
         public @NonNull Builder bind(char key, @NonNull Supplier<@Nullable ItemStack> supplier) {
             if (layout != null) layout.bind(key, supplier);
             return this;
@@ -456,6 +466,13 @@ public final class ChestMenu implements Menu {
         @CheckReturnValue
         public @NonNull Builder item(int slot, @NonNull Function<@NonNull Player, @Nullable ItemStack> function) {
             this.slotItems.put(slot, function);
+            return this;
+        }
+
+        @CheckReturnValue
+        public @NonNull Builder button(int slot, @NonNull GuiButton button) {
+            this.slotItems.put(slot, player -> button.render(1, 1, false));
+            this.slotHandlers.put(slot, button::handleClick);
             return this;
         }
 

@@ -2,6 +2,7 @@ package dev.oum.oumlib.inventory;
 
 import dev.oum.oumlib.event.Events;
 import dev.oum.oumlib.event.ListenerHandle;
+import dev.oum.oumlib.math.FastMath;
 import dev.oum.oumlib.scheduler.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -12,6 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -19,8 +21,14 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+/**
+ * @deprecated Superseded by {@link GuiContainer} with {@link GuiScreen#setPaginatedSection}.
+ */
+@Deprecated(since = "1.0.9", forRemoval = false)
+@ApiStatus.Obsolete
 public final class PaginatedMenu implements Menu {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
@@ -86,7 +94,7 @@ public final class PaginatedMenu implements Menu {
     public int totalPages(@Nullable Player player) {
         List<ItemStack> list = itemsSupplier.apply(player);
         int size = list != null ? list.size() : 0;
-        return Math.max(1, (int) Math.ceil((double) size / contentSlots.length));
+        return FastMath.max(1, FastMath.ceilToInt((double) size / contentSlots.length));
     }
 
     @Override
@@ -265,11 +273,15 @@ public final class PaginatedMenu implements Menu {
         unregisterListeners();
     }
 
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @FunctionalInterface
     public interface PaginatedClickHandler {
         void onClick(ClickContext ctx, ItemStack item, int index);
     }
 
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static final class Builder {
 
         private Function<Player, List<ItemStack>> itemsSupplier = p -> new ArrayList<>();
@@ -292,6 +304,12 @@ public final class PaginatedMenu implements Menu {
         }
 
         @CheckReturnValue
+        public @NonNull Builder onItemClick(@NonNull BiConsumer<ClickContext, ItemStack> handler) {
+            this.clickHandler = (ctx, item, index) -> handler.accept(ctx, item);
+            return this;
+        }
+
+        @CheckReturnValue
         public @NonNull Builder title(@NonNull String title) {
             this.title = title;
             return this;
@@ -306,6 +324,12 @@ public final class PaginatedMenu implements Menu {
         @CheckReturnValue
         public @NonNull Builder contentSlots(int @NonNull ... slots) {
             this.contentSlots = slots;
+            return this;
+        }
+
+        @CheckReturnValue
+        public @NonNull Builder contentSlots(@NonNull List<Integer> slots) {
+            this.contentSlots = slots.stream().mapToInt(Integer::intValue).toArray();
             return this;
         }
 

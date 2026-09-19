@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -180,6 +181,11 @@ public final class ItemBuilder {
         return this;
     }
 
+    /**
+     * @deprecated Superseded by {@link #itemModel(Key)} in Minecraft 1.21.2+.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @Contract(value = "_ -> this", mutates = "this")
     @SuppressWarnings("deprecation")
     public @NonNull ItemBuilder customModelData(@Nullable Integer data) {
@@ -187,6 +193,11 @@ public final class ItemBuilder {
         return this;
     }
 
+    /**
+     * @deprecated Superseded by {@link #itemModel(Key)} in Minecraft 1.21.2+.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @Contract(value = "_ -> this", mutates = "this")
     public @NonNull ItemBuilder modelData(int data) {
         return customModelData(data);

@@ -6,6 +6,7 @@ import dev.oum.oumlib.text.Format;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 
@@ -254,7 +255,12 @@ public final class Arguments {
         throw new UnsupportedOperationException("Entities argument is only supported on Paper.");
     }
 
+    /**
+     * @deprecated Use {@link dev.oum.oumlib.text.Format#parseDuration(String)}.
+     */
     @Deprecated(since = "1.0.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.1.0")
+    @ApiStatus.Obsolete
     public static @NonNull Duration parseDuration(@NonNull String input) {
         return Format.parseDuration(input);
     }

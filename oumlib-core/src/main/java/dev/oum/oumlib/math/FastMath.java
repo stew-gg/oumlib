@@ -4,6 +4,9 @@ import org.jetbrains.annotations.Contract;
 
 public final class FastMath {
 
+    public static final double PI = Math.PI;
+    public static final double E = Math.E;
+
     private FastMath() {
     }
 
@@ -31,6 +34,83 @@ public final class FastMath {
         if (val < min) return min;
         if (val > max) return max;
         return val;
+    }
+
+    @Contract(pure = true)
+    public static long clamp(long val, long min, long max) {
+        if (val < min) return min;
+        if (val > max) return max;
+        return val;
+    }
+
+    @Contract(pure = true)
+    public static int min(int a, int b) {
+        return a <= b ? a : b;
+    }
+
+    @Contract(pure = true)
+    public static int max(int a, int b) {
+        return a >= b ? a : b;
+    }
+
+    @Contract(pure = true)
+    public static long min(long a, long b) {
+        return a <= b ? a : b;
+    }
+
+    @Contract(pure = true)
+    public static long max(long a, long b) {
+        return a >= b ? a : b;
+    }
+
+    @Contract(pure = true)
+    public static double min(double a, double b) {
+        return Math.min(a, b);
+    }
+
+    @Contract(pure = true)
+    public static double max(double a, double b) {
+        return Math.max(a, b);
+    }
+
+    @Contract(pure = true)
+    public static double sqrt(double val) {
+        return Math.sqrt(val);
+    }
+
+    @Contract(pure = true)
+    public static int roundToInt(double val) {
+        return (int) Math.round(val);
+    }
+
+    @Contract(pure = true)
+    public static int abs(int val) {
+        return val < 0 ? -val : val;
+    }
+
+    @Contract(pure = true)
+    public static double abs(double val) {
+        return val < 0.0 ? -val : val;
+    }
+
+    @Contract(pure = true)
+    public static double ceil(double val) {
+        return Math.ceil(val);
+    }
+
+    @Contract(pure = true)
+    public static int ceilToInt(double val) {
+        return (int) Math.ceil(val);
+    }
+
+    @Contract(pure = true)
+    public static double floor(double val) {
+        return Math.floor(val);
+    }
+
+    @Contract(pure = true)
+    public static int floorToInt(double val) {
+        return (int) Math.floor(val);
     }
 
     @Contract(pure = true)

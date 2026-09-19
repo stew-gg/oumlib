@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 public final class PlaceholderRegistry {
 
     private final Map<String, Map<String, PlaceholderSupplier>> namespaces = new HashMap<>();
+    private final Map<String, BiFunction<String, Object, String>> dynamicResolvers = new HashMap<>();
     private String currentNamespace;
 
     public PlaceholderRegistry forNamespace(String namespace) {
@@ -70,16 +71,27 @@ public final class PlaceholderRegistry {
         }
     }
 
+    public PlaceholderRegistry dynamic(BiFunction<String, Object, String> fn) {
+        ensureNamespace();
+        dynamicResolvers.put(currentNamespace, fn);
+        return this;
+    }
+
     public @Nullable String resolve(String namespace, String key, Object player, Map<String, String> params) {
         Map<String, PlaceholderSupplier> suppliers = namespaces.get(namespace);
-        if (suppliers == null) return null;
-        PlaceholderSupplier supplier = suppliers.get(key);
-        if (supplier == null) return null;
-        return switch (supplier) {
-            case PlaceholderSupplier.PlayerSupplier ps -> player != null ? ps.fn().apply(player) : null;
-            case PlaceholderSupplier.ParamSupplier ps -> player != null ? ps.fn().apply(player, params) : null;
-            case PlaceholderSupplier.GlobalSupplier gs -> gs.fn().get();
-        };
+        if (suppliers != null) {
+            PlaceholderSupplier supplier = suppliers.get(key);
+            if (supplier != null) {
+                return switch (supplier) {
+                    case PlaceholderSupplier.PlayerSupplier ps -> player != null ? ps.fn().apply(player) : null;
+                    case PlaceholderSupplier.ParamSupplier ps -> player != null ? ps.fn().apply(player, params) : null;
+                    case PlaceholderSupplier.GlobalSupplier gs -> gs.fn().get();
+                };
+            }
+        }
+        BiFunction<String, Object, String> dyn = dynamicResolvers.get(namespace);
+        if (dyn != null) return dyn.apply(key, player);
+        return null;
     }
 
     @Contract(pure = true)

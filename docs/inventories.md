@@ -54,9 +54,12 @@ By default, players can't take items from the menu. The whole inventory is locke
 
 ---
 
-## PaginatedMenu
+## PaginatedMenu (Deprecated)
 
-For when you have a list of items and want pages:
+> [!NOTE]
+> `PaginatedMenu` is deprecated as of 1.0.9 in favor of `GuiContainer` and `GuiScreen#setPaginatedSection`.
+
+For simple legacy list pagination:
 
 ```java
 List<ItemStack> items = getShopItems(); // your list
@@ -187,13 +190,159 @@ String json = PotionSerializer.serializeList(effects);
 List<PotionEffect> effects = PotionSerializer.deserializeList(json);
 ```
 
----
+## GuiContainer & GuiScreen (Modern Framework)
 
-## Layout
+For advanced multi-screen interfaces, dynamic animations, paginated sections, and editable player inventories, use `GuiContainer`. Inspired by Rosewood's GuiFramework, it gives you a robust multi-screen container model with breadcrumbs, screen transitions, ticking, and component buttons.
 
-Helper for generating slot lists:
+### Creating a Multi-Screen Container
 
 ```java
-List<Integer> slots = Layout.rectangle(startRow, startCol, endRow, endCol);
-List<Integer> border = Layout.border(rows);
+GuiContainer container = GuiContainer.create()
+    .setTickRate(1)         // ticks dynamic buttons/screens every 1 tick
+    .setPersistent(false)   // automatically unregisters when all players close
+    .preventItemDropping(true);
+
+// Screen 0: Category Selector (3 rows)
+GuiScreen categoryScreen = container.createScreen(GuiSize.ROWS_THREE)
+    .setTitle("<gradient:gold:yellow>Select Category</gradient>");
+
+GuiUtil.fillBorders(categoryScreen, ItemBuilder.of(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
+
+// Screen 1: Item Browser (6 rows)
+GuiScreen browseScreen = container.createScreen(GuiSize.ROWS_SIX)
+    .setTitle("<yellow>Category Browser - Page <page>/<pages></yellow>");
+
+GuiUtil.fillBorders(browseScreen, ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE).name(" ").build());
+
+// Button to transition forward to Screen 1
+categoryScreen.addButtonAt(13, GuiButton.of(Material.DIAMOND)
+    .name("<aqua>View Diamonds")
+    .loreStrings("<gray>Click to browse diamond items")
+    .onClick(ctx -> GuiAction.TRANSITION_FORWARDS));
+
+// Back button on Screen 1 to return to Screen 0
+browseScreen.addButtonAt(45, GuiButton.of(Material.ARROW)
+    .name("<yellow>Go Back")
+    .onClick(ctx -> GuiAction.TRANSITION_BACKWARDS));
+
+// Open for player
+container.open(player);
+```
+
+---
+
+## GuiButton & Reactive Animations
+
+`GuiButton` is a first-class component supporting MiniMessage text, click sounds, conditional visibility, and dynamic suppliers for live animations:
+
+```java
+AtomicInteger hue = new AtomicInteger(0);
+
+GuiButton animatedButton = GuiButton.of(Material.LEATHER_CHESTPLATE)
+    .nameStringSupplier(() -> "<gradient:red:gold>Animated Level: " + player.getLevel() + "</gradient>")
+    .loreStringSupplier(() -> List.of(
+        "<gray>Real-time player balance: <green>$" + getBalance(player),
+        "<yellow>Updated every tick automatically!"
+    ))
+    .iconSupplier(() -> {
+        int h = hue.addAndGet(10) % 360;
+        return ItemBuilder.of(Material.LEATHER_CHESTPLATE)
+            .leatherColor(Color.fromRGB(255, (h * 2) % 255, 100))
+            .build();
+    })
+    .clickSound(Key.key("minecraft:ui.button.click"), 1.0f, 1.2f)
+    .onClick(ctx -> {
+        ctx.player().sendMessage("Button clicked!");
+        return GuiAction.NOTHING; // or REFRESH, CLOSE, PAGE_FORWARDS, etc.
+    });
+
+screen.addButtonAt(GuiUtil.slot(2, 4), animatedButton);
+```
+
+### Action Results (`GuiAction`)
+- `GuiAction.NOTHING`: Do nothing
+- `GuiAction.REFRESH`: Rerender current screen
+- `GuiAction.CLOSE`: Close the inventory
+- `GuiAction.PAGE_FORWARDS` / `PAGE_BACKWARDS`: Change page in paginated section
+- `GuiAction.PAGE_FIRST` / `PAGE_LAST`: Jump to first or last page
+- `GuiAction.TRANSITION_FORWARDS` / `TRANSITION_BACKWARDS`: Move between screens
+
+---
+
+## Paginated Sections
+
+Instead of locking an entire inventory into pagination, you can define a `GuiScreenSection` on any sub-region of a `GuiScreen`:
+
+```java
+GuiScreenSection contentSection = GuiScreenSection.rectangle(1, 1, 4, 7); // 28 slots
+
+screen.setPaginatedSection(contentSection, items.size(), (pageNumber, startIndex, endIndex) -> {
+    GuiPageContentsResult result = GuiPageContentsResult.of();
+    for (int i = startIndex; i <= Math.min(endIndex, items.size() - 1); i++) {
+        result.addPageContent(items.get(i));
+    }
+    return result;
+});
+
+// Auto-hiding navigation buttons with GuiButtonFlag
+screen.addButtonAt(47, GuiButton.of(Material.PAPER)
+    .name("<yellow>Previous (<prev_page>/<pages>)")
+    .flags(GuiButtonFlag.HIDE_IF_FIRST_PAGE)
+    .hiddenReplacement(ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE).name(" ").build())
+    .onClick(ctx -> GuiAction.PAGE_BACKWARDS));
+
+screen.addButtonAt(51, GuiButton.of(Material.PAPER)
+    .name("<yellow>Next (<next_page>/<pages>)")
+    .flags(GuiButtonFlag.HIDE_IF_LAST_PAGE)
+    .hiddenReplacement(ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE).name(" ").build())
+    .onClick(ctx -> GuiAction.PAGE_FORWARDS));
+```
+
+---
+
+## Editable Sections
+
+Designate safe zones where players can place, retrieve, and modify items (e.g. for enchanting tables, trash bins, auction deposits, or item upgraders):
+
+```java
+GuiScreenSection dropZone = GuiScreenSection.of(10, 11, 12, 13, 14, 15, 16);
+
+screen.setEditableSection(dropZone, List.of(), (player, depositedItems) -> {
+    player.sendMessage("You saved " + depositedItems.size() + " items!");
+    giveReward(player, depositedItems);
+});
+
+// Restrict what items can be placed
+screen.setEditFilters(GuiScreenEditFilters.create()
+    .whitelist(Material.DIAMOND, Material.NETHERITE_INGOT)
+    .maxItems(64));
+
+// Listen to changes in real-time
+screen.addSlotListener(13, newItem -> {
+    player.sendMessage("Center slot changed to: " + (newItem != null ? newItem.getType() : "Empty"));
+});
+```
+
+---
+
+## GuiUtil & Layout Helpers
+
+```java
+// Fill patterns
+GuiUtil.fillScreen(screen, borderItem);
+GuiUtil.fillBorders(screen, borderItem);
+GuiUtil.fillRectangle(screen, 1, 1, 4, 7, item);
+GuiUtil.fillRow(screen, 0, headerItem);
+GuiUtil.fillColumn(screen, 8, sidebarItem);
+
+// Coordinates (0-indexed and 1-indexed)
+int slot = GuiUtil.slot(row, col);      // row 0-5, col 0-8
+int slot1 = GuiUtil.slot1(row, col);    // row 1-6, col 1-9
+int row = GuiUtil.row(slot);
+int col = GuiUtil.col(slot);
+
+// Layout helpers
+int[] rect = Layout.rectangle(startRow, startCol, endRow, endCol);
+int[] border = Layout.border(rows);
+List<Integer> slots = Layout.rectangleList(startRow, startCol, endRow, endCol);
 ```

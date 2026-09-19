@@ -1,5 +1,6 @@
 package dev.oum.oumlib.text;
 
+import dev.oum.oumlib.math.FastMath;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.Contract;
@@ -33,14 +34,14 @@ public final class Pagination<T> {
     }
 
     public int totalPages() {
-        return Math.max(1, (int) Math.ceil((double) items.size() / pageSize));
+        return FastMath.max(1, FastMath.ceilToInt((double) items.size() / pageSize));
     }
 
     public void send(@NonNull Audience audience, int page) {
-        int clamped = Math.clamp(page, 1, totalPages());
+        int clamped = FastMath.clamp(page, 1, totalPages());
         audience.sendMessage(MM.deserialize(placeholders(header, clamped)));
         int start = (clamped - 1) * pageSize;
-        int end = Math.min(start + pageSize, items.size());
+        int end = FastMath.min(start + pageSize, items.size());
         for (int i = start; i < end; i++) {
             audience.sendMessage(MM.deserialize(entryRenderer.apply(items.get(i))));
         }
@@ -53,8 +54,8 @@ public final class Pagination<T> {
         return template
                 .replace("<page>", String.valueOf(page))
                 .replace("<total>", String.valueOf(totalPages()))
-                .replace("<next>", String.valueOf(Math.min(page + 1, totalPages())))
-                .replace("<prev>", String.valueOf(Math.max(page - 1, 1)));
+                .replace("<next>", String.valueOf(FastMath.min(page + 1, totalPages())))
+                .replace("<prev>", String.valueOf(FastMath.max(page - 1, 1)));
     }
 
     public static final class Builder<T> {

@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.title.Title;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
@@ -221,6 +222,11 @@ public final class Text {
         ascii(false, lines);
     }
 
+    /**
+     * @deprecated Use {@link dev.oum.oumlib.text.PresetRegistry} via {@link dev.oum.oumlib.OumLib#presets()} to avoid naming collision with {@link Preset}.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static final class Preset {
 
         private Preset() {

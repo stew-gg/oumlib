@@ -2,6 +2,7 @@ package dev.oum.oumlib.command;
 
 import dev.oum.oumlib.bridge.permission.Permission;
 import dev.oum.oumlib.cooldown.CooldownManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
@@ -49,8 +50,12 @@ public final class SubcommandBuilder {
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #permission(Permission)} for type safety.
+     */
+    @Deprecated(since = "1.0.5", forRemoval = false)
+    @ApiStatus.Obsolete
     @Contract(value = "_ -> this", mutates = "this")
-    @Deprecated(since = "1.0.5")
     public @NonNull SubcommandBuilder permission(@NonNull String permission) {
         this.permission = permission;
         return this;

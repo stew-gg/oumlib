@@ -1,5 +1,6 @@
 package dev.oum.oumlib.math.region;
 
+import dev.oum.oumlib.math.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -24,22 +25,22 @@ public class CuboidRegion implements Region {
     public CuboidRegion(@NonNull Location loc1, @NonNull Location loc2) {
         World w = loc1.getWorld() != null ? loc1.getWorld() : loc2.getWorld();
         this.worldName = w != null ? w.getName() : "world";
-        this.minX = Math.min(loc1.getX(), loc2.getX());
-        this.minY = Math.min(loc1.getY(), loc2.getY());
-        this.minZ = Math.min(loc1.getZ(), loc2.getZ());
-        this.maxX = Math.max(loc1.getX(), loc2.getX());
-        this.maxY = Math.max(loc1.getY(), loc2.getY());
-        this.maxZ = Math.max(loc1.getZ(), loc2.getZ());
+        this.minX = FastMath.min(loc1.getX(), loc2.getX());
+        this.minY = FastMath.min(loc1.getY(), loc2.getY());
+        this.minZ = FastMath.min(loc1.getZ(), loc2.getZ());
+        this.maxX = FastMath.max(loc1.getX(), loc2.getX());
+        this.maxY = FastMath.max(loc1.getY(), loc2.getY());
+        this.maxZ = FastMath.max(loc1.getZ(), loc2.getZ());
     }
 
     public CuboidRegion(@NonNull String worldName, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this.worldName = worldName;
-        this.minX = Math.min(minX, maxX);
-        this.minY = Math.min(minY, maxY);
-        this.minZ = Math.min(minZ, maxZ);
-        this.maxX = Math.max(minX, maxX);
-        this.maxY = Math.max(minY, maxY);
-        this.maxZ = Math.max(minZ, maxZ);
+        this.minX = FastMath.min(minX, maxX);
+        this.minY = FastMath.min(minY, maxY);
+        this.minZ = FastMath.min(minZ, maxZ);
+        this.maxX = FastMath.max(minX, maxX);
+        this.maxY = FastMath.max(minY, maxY);
+        this.maxZ = FastMath.max(minZ, maxZ);
     }
 
     public static @NonNull CuboidRegion of(@NonNull Location loc1, @NonNull Location loc2) {
@@ -100,27 +101,27 @@ public class CuboidRegion implements Region {
     }
 
     public int getMinBlockX() {
-        return (int) Math.floor(minX);
+        return FastMath.floorToInt(minX);
     }
 
     public int getMinBlockY() {
-        return (int) Math.floor(minY);
+        return FastMath.floorToInt(minY);
     }
 
     public int getMinBlockZ() {
-        return (int) Math.floor(minZ);
+        return FastMath.floorToInt(minZ);
     }
 
     public int getMaxBlockX() {
-        return (int) Math.floor(maxX);
+        return FastMath.floorToInt(maxX);
     }
 
     public int getMaxBlockY() {
-        return (int) Math.floor(maxY);
+        return FastMath.floorToInt(maxY);
     }
 
     public int getMaxBlockZ() {
-        return (int) Math.floor(maxZ);
+        return FastMath.floorToInt(maxZ);
     }
 
     public @NonNull Location getMinimumPoint() {

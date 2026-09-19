@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -45,10 +46,20 @@ public final class VolatileData implements Listener {
         set(target, key.key(), value, ttl);
     }
 
+    /**
+     * @deprecated Use {@link #set(Object, DataKey, Object)} or {@link #set(Object, NamespacedKey, Object, Duration)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static void set(@NonNull Object target, @NonNull String key, @NonNull Object value) {
         set(target, resolveKey(key), value, null);
     }
 
+    /**
+     * @deprecated Use {@link #set(Object, DataKey, Object, Duration)} or {@link #set(Object, NamespacedKey, Object, Duration)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static void set(@NonNull Object target, @NonNull String key, @NonNull Object value, @Nullable Duration ttl) {
         set(target, resolveKey(key), value, ttl);
     }
@@ -70,6 +81,11 @@ public final class VolatileData implements Listener {
         return get(target, key.key());
     }
 
+    /**
+     * @deprecated Use {@link #get(Object, DataKey)} or {@link #get(Object, NamespacedKey)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @CheckReturnValue
     public static <T> @NonNull Optional<T> get(@NonNull Object target, @NonNull String key) {
         return get(target, resolveKey(key));
@@ -99,6 +115,11 @@ public final class VolatileData implements Listener {
         return get(target, key).orElse(defaultValue);
     }
 
+    /**
+     * @deprecated Use {@link #getOrDefault(Object, DataKey, Object)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @CheckReturnValue
     public static <T> @NonNull T getOrDefault(@NonNull Object target, @NonNull String key, @NonNull T defaultValue) {
         return get(target, resolveKey(key)).map(val -> (T) val).orElse(defaultValue);
@@ -109,6 +130,11 @@ public final class VolatileData implements Listener {
         return get(target, key).isPresent();
     }
 
+    /**
+     * @deprecated Use {@link #has(Object, DataKey)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     @CheckReturnValue
     public static boolean has(@NonNull Object target, @NonNull String key) {
         return get(target, key).isPresent();
@@ -118,6 +144,11 @@ public final class VolatileData implements Listener {
         remove(target, key.key());
     }
 
+    /**
+     * @deprecated Use {@link #remove(Object, DataKey)} or {@link #remove(Object, NamespacedKey)} for type safety.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static void remove(@NonNull Object target, @NonNull String key) {
         remove(target, resolveKey(key));
     }

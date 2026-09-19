@@ -29,6 +29,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * @deprecated Superseded by {@link dev.oum.oumlib.text.TextInput}.
+ */
+@Deprecated(since = "1.0.9", forRemoval = false)
 @SuppressWarnings({"UnstableApiUsage", "unused"})
 @ApiStatus.Obsolete
 public final class AnvilMenu implements Menu {
@@ -211,6 +215,11 @@ public final class AnvilMenu implements Menu {
         unregisterListeners();
     }
 
+    /**
+     * @deprecated Superseded by {@link dev.oum.oumlib.text.TextInput}.
+     */
+    @Deprecated(since = "1.0.9", forRemoval = false)
+    @ApiStatus.Obsolete
     public static final class Builder {
 
         private String title = "Search";

@@ -2,9 +2,10 @@ package dev.oum.oumlib.effect;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
+import net.kyori.adventure.sound.Sound.Type;
 import org.bukkit.Location;
-import org.bukkit.Registry;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.CheckReturnValue;
@@ -25,12 +26,8 @@ public final class SoundBuilder {
         this.soundKey = soundKey;
     }
 
-    public SoundBuilder(net.kyori.adventure.sound.Sound.@NonNull Type soundType) {
+    public SoundBuilder(@NonNull Type soundType) {
         this.soundKey = soundType.key();
-    }
-
-    public SoundBuilder(org.bukkit.@NonNull Sound sound) {
-        this.soundKey = Registry.SOUNDS.getKey(sound);
     }
 
     @Contract(value = "_ -> this", mutates = "this")
@@ -76,8 +73,8 @@ public final class SoundBuilder {
 
     @Contract("-> new")
     @CheckReturnValue
-    public net.kyori.adventure.sound.@NonNull Sound build() {
-        return net.kyori.adventure.sound.Sound.sound(soundKey, source, volume, calculatePitch());
+    public @NonNull Sound build() {
+        return Sound.sound(soundKey, source, volume, calculatePitch());
     }
 
     public void play(@NonNull Audience audience) {
